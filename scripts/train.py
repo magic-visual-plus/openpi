@@ -26,6 +26,11 @@ import openpi.training.sharding as sharding
 import openpi.training.utils as training_utils
 import openpi.training.weight_loaders as _weight_loaders
 
+import os
+
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com/'
+
+
 
 def init_logging():
     """Custom logging format for better readability."""
@@ -193,6 +198,7 @@ def train_step(
 def main(config: _config.TrainConfig):
     init_logging()
     logging.info(f"Running on: {platform.node()}")
+    logging.info(f'train config {config}')
 
     if config.batch_size % jax.device_count() != 0:
         raise ValueError(

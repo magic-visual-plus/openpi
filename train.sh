@@ -1,0 +1,1 @@
+XLA_PYTHON_CLIENT_MEM_FRACTION=0.9 proxychains uv run scripts/train.py pi0_libero_low_mem_finetune --exp-name=my_experiment --overwrite

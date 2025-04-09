@@ -1,3 +1,8 @@
+import os
+
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com/'
+
+
 import dataclasses
 import logging
 
@@ -212,15 +217,18 @@ class Pi0(_model.BaseModel):
         input_mask = []
         ar_mask = []
         tokens = []
+        print(f'noisy_actions shape {noisy_actions.shape}')
         # add a single state token
         state_token = self.state_proj(obs.state)[:, None, :]
+        print(f'state token shape {state_token.shape}')
         tokens.append(state_token)
         input_mask.append(jnp.ones((obs.state.shape[0], 1), dtype=jnp.bool_))
         # image/language inputs do not attend to state or actions
         ar_mask += [True]
-
+        print(f'timestamp {timestep}')
         # embed timestep using sine-cosine positional encoding with sensitivity in the range [0, 1]
         time_emb = posemb_sincos(timestep, self.action_in_proj.out_features, min_period=4e-3, max_period=4.0)
+        print(f'time_emb shape {time_emb.shape}')
         # mix timestep + action information using an MLP
         action_tokens = self.action_in_proj(noisy_actions)
         time_tokens = einops.repeat(time_emb, "b emb -> b s emb", s=self.action_horizon)
@@ -228,6 +236,7 @@ class Pi0(_model.BaseModel):
         action_time_tokens = self.action_time_mlp_in(action_time_tokens)
         action_time_tokens = nnx.swish(action_time_tokens)
         action_time_tokens = self.action_time_mlp_out(action_time_tokens)
+        print(f'action time token shape {action_time_tokens.shape}')
         tokens.append(action_time_tokens)
         input_mask.append(jnp.ones(action_time_tokens.shape[:2], dtype=jnp.bool_))
         # image/language/state inputs do not attend to action tokens
@@ -282,7 +291,9 @@ class Pi0(_model.BaseModel):
 
         # first fill KV cache with a forward pass of the prefix
         prefix_tokens, prefix_mask, prefix_ar_mask = self.embed_prefix(observation)
+        # print(f'prefix_mask shape {prefix_mask.shape}, prefix_mask  value {prefix_mask}')
         prefix_attn_mask = make_attn_mask(prefix_mask, prefix_ar_mask)
+        print(f'prefix_attn_mask shape {prefix_attn_mask.shape}, prefix_attn_mask value {prefix_attn_mask} ')
         positions = jnp.cumsum(prefix_mask, axis=1) - 1
         _, kv_cache = self.PaliGemma.llm([prefix_tokens, None], mask=prefix_attn_mask, positions=positions)
 
@@ -294,12 +305,14 @@ class Pi0(_model.BaseModel):
             # `suffix_attn_mask` is shape (b, suffix_len, suffix_len) indicating how the suffix tokens can attend to each
             # other
             suffix_attn_mask = make_attn_mask(suffix_mask, suffix_ar_mask)
+            print(f'time {time}, suffix_attn_mask shape {suffix_attn_mask.shape}, suffix_attn_mask {suffix_attn_mask}')
             # `prefix_attn_mask` is shape (b, suffix_len, prefix_len) indicating how the suffix tokens can attend to the
             # prefix tokens
             prefix_attn_mask = einops.repeat(prefix_mask, "b p -> b s p", s=suffix_tokens.shape[1])
             # `combined_mask` is shape (b, suffix_len, prefix_len + suffix_len) indicating how the suffix tokens (which
             # generate the queries) can attend to the full prefix + suffix sequence (which generates the keys and values)
             full_attn_mask = jnp.concatenate([prefix_attn_mask, suffix_attn_mask], axis=-1)
+            print(f'time {time}, full_attn_mask shape {full_attn_mask.shape}, full_attn_mask {full_attn_mask}')
             assert full_attn_mask.shape == (
                 batch_size,
                 suffix_tokens.shape[1],
@@ -307,12 +320,14 @@ class Pi0(_model.BaseModel):
             )
             # `positions` is shape (b, suffix_len) indicating the positions of the suffix tokens
             positions = jnp.sum(prefix_mask, axis=-1)[:, None] + jnp.cumsum(suffix_mask, axis=-1) - 1
-
+            print(f'suffix_tokens shape {suffix_tokens.shape}')
             (prefix_out, suffix_out), _ = self.PaliGemma.llm(
                 [None, suffix_tokens], mask=full_attn_mask, positions=positions, kv_cache=kv_cache
             )
             assert prefix_out is None
+            print(f'suffix_out shape {suffix_out.shape}')
             v_t = self.action_out_proj(suffix_out[:, -self.action_horizon :])
+            print(f'v_t shape {v_t.shape}')
 
             return x_t + dt * v_t, time + dt
 

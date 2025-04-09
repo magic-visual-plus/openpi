@@ -32,6 +32,7 @@ class Policy(BasePolicy):
     ):
         self._sample_actions = nnx_utils.module_jit(model.sample_actions)
         self._input_transform = _transforms.compose(transforms)
+        # print(f'output_transforms {output_transforms}')
         self._output_transform = _transforms.compose(output_transforms)
         self._rng = rng or jax.random.key(0)
         self._sample_kwargs = sample_kwargs or {}
@@ -53,6 +54,7 @@ class Policy(BasePolicy):
 
         # Unbatch and convert to np.ndarray.
         outputs = jax.tree.map(lambda x: np.asarray(x[0, ...]), outputs)
+        # print(f'outputs shape {outputs.shape}')
         return self._output_transform(outputs)
 
     @property

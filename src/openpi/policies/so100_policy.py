@@ -7,12 +7,12 @@ from openpi import transforms
 from openpi.models import model as _model
 
 
-def make_libero_example() -> dict:
-    """Creates a random input example for the Libero policy."""
+def make_so100_example() -> dict:
+    """Creates a random input example for the so100 policy."""
     return {
-        "observation/state": np.random.rand(8),
+        "observation/state": np.random.rand(6),
         "observation/image": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
-        "observation/wrist_image": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
+        "observation/wrist_image": np.zeros((224, 224, 3), dtype=np.uint8),
         "prompt": "do something",
     }
 
@@ -27,7 +27,7 @@ def _parse_image(image) -> np.ndarray:
 
 
 @dataclasses.dataclass(frozen=True)
-class LiberoInputs(transforms.DataTransformFn):
+class So100Inputs(transforms.DataTransformFn):
     """
     This class is used to convert inputs to the model to the expected format. It is used for both training and inference.
 
@@ -64,20 +64,20 @@ class LiberoInputs(transforms.DataTransformFn):
         # of image, e.g. wrist images, you can comment it out here and replace it with zeros like we do for the
         # right wrist image below.
         base_image = _parse_image(data["observation/image"])
-        wrist_image = _parse_image(data["observation/wrist_image"])
 
-        # Create inputs dict. Do not change the keys in the dict lbelow.
+        # Create inputs dict. Do not change the keys in the dict below.
         inputs = {
             "state": state,
             "image": {
                 "base_0_rgb": base_image,
-                "left_wrist_0_rgb": wrist_image,
+                "left_wrist_0_rgb": np.zeros_like(base_image),
                 # Pad any non-existent images with zero-arrays of the appropriate shape.
                 "right_wrist_0_rgb": np.zeros_like(base_image),
             },
             "image_mask": {
                 "base_0_rgb": np.True_,
-                "left_wrist_0_rgb": np.True_,
+                # Mask any non-existent images with False (if ``mask_padding`` is True).
+                "left_wrist_0_rgb": np.False_ if mask_padding else np.True_,
                 # Mask any non-existent images with False (if ``mask_padding`` is True).
                 "right_wrist_0_rgb": np.False_ if mask_padding else np.True_,
             },
@@ -101,7 +101,7 @@ class LiberoInputs(transforms.DataTransformFn):
 
 
 @dataclasses.dataclass(frozen=True)
-class LiberoOutputs(transforms.DataTransformFn):
+class So100Outputs(transforms.DataTransformFn):
     """
     This class is used to convert outputs from the model back the the dataset specific format. It is
     used for inference only.
@@ -112,6 +112,6 @@ class LiberoOutputs(transforms.DataTransformFn):
     def __call__(self, data: dict) -> dict:
         # Only return the first N actions -- since we padded actions above to fit the model action
         # dimension, we need to now parse out the correct number of actions in the return dict.
-        # For Libero, we only return the first 7 actions (since the rest is padding).
-        # For your own dataset, replace `7` with the action dimension of your dataset.
-        return {"actions": np.asarray(data["actions"][:, :7])}
+        # For Libero, we only return the first 6 actions (since the rest is padding).
+        # For your own dataset, replace `6` with the action dimension of your dataset.
+        return {"actions": np.asarray(data["actions"][:, :6])}

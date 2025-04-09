@@ -17,6 +17,9 @@ You can download the raw Libero datasets from https://huggingface.co/datasets/op
 The resulting dataset will get saved to the $LEROBOT_HOME directory.
 Running this conversion script will take approximately 30 minutes.
 """
+import os
+
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com/'
 
 import shutil
 
@@ -25,7 +28,7 @@ from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 import tensorflow_datasets as tfds
 import tyro
 
-REPO_NAME = "your_hf_username/libero"  # Name of the output dataset, also used for the Hugging Face Hub
+REPO_NAME = "xbkaishui/libero"  # Name of the output dataset, also used for the Hugging Face Hub
 RAW_DATASET_NAMES = [
     "libero_10_no_noops",
     "libero_goal_no_noops",
@@ -33,6 +36,10 @@ RAW_DATASET_NAMES = [
     "libero_spatial_no_noops",
 ]  # For simplicity we will combine multiple Libero datasets into one training dataset
 
+
+RAW_DATASET_NAMES = [
+    "libero_spatial_no_noops"
+]
 
 def main(data_dir: str, *, push_to_hub: bool = False):
     # Clean up any existing dataset in the output directory
@@ -99,8 +106,10 @@ def main(data_dir: str, *, push_to_hub: bool = False):
             private=False,
             push_videos=True,
             license="apache-2.0",
+            token="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",
         )
 
 
 if __name__ == "__main__":
-    tyro.cli(main)
+    # tyro.cli(main)
+    main("/opt/datasets/modified_libero_rlds")

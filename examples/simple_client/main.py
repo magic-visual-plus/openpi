@@ -22,11 +22,12 @@ class Args:
     host: str = "0.0.0.0"
     port: int = 8000
 
-    env: EnvMode = EnvMode.ALOHA_SIM
+    env: EnvMode = EnvMode.DROID
     num_steps: int = 10
 
 
 def main(args: Args) -> None:
+    print(f'env {args.env}')
     obs_fn = {
         EnvMode.ALOHA: _random_observation_aloha,
         EnvMode.ALOHA_SIM: _random_observation_aloha,

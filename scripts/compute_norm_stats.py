@@ -5,6 +5,11 @@ will compute the mean and standard deviation of the data in the dataset and save
 to the config assets directory.
 """
 
+import os
+
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com/'
+
+
 import numpy as np
 import tqdm
 import tyro
@@ -37,9 +42,14 @@ def create_dataset(config: _config.TrainConfig) -> tuple[_config.DataConfig, _da
     return data_config, dataset
 
 
-def main(config_name: str, max_frames: int | None = None):
+def main(config_name: str = "pi0_so100_low_mem_finetune", max_frames: int | None = None):
+    
     config = _config.get_config(config_name)
     data_config, dataset = create_dataset(config)
+    
+    output_path = config.assets_dirs / data_config.repo_id
+    print(f"Writing stats to: {output_path}")
+    # return
 
     num_frames = len(dataset)
     shuffle = False
@@ -51,7 +61,7 @@ def main(config_name: str, max_frames: int | None = None):
     data_loader = _data_loader.TorchDataLoader(
         dataset,
         local_batch_size=1,
-        num_workers=8,
+        num_workers=10,
         shuffle=shuffle,
         num_batches=num_frames,
     )
@@ -60,12 +70,14 @@ def main(config_name: str, max_frames: int | None = None):
     stats = {key: normalize.RunningStats() for key in keys}
 
     for batch in tqdm.tqdm(data_loader, total=num_frames, desc="Computing stats"):
+        # print(f'batch keys {batch.keys()}')
         for key in keys:
             values = np.asarray(batch[key][0])
             stats[key].update(values.reshape(-1, values.shape[-1]))
 
     norm_stats = {key: stats.get_statistics() for key, stats in stats.items()}
-
+    
+    os.makedirs(config.assets_dirs, exist_ok=True)
     output_path = config.assets_dirs / data_config.repo_id
     print(f"Writing stats to: {output_path}")
     normalize.save(output_path, norm_stats)
