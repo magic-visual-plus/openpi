@@ -217,8 +217,8 @@ class LeRobotAuboDataConfig(DataConfigFactory):
                 # 把数据集中的键映射到模型的输入键
                 _transforms.RepackTransform(
                     {
-                        "image": "images",
-                        "wrist_image": "ORB_images",
+                        "image": "image",
+                        "wrist_image": "wrist_image",
                         "state": "state",
                         "actions": "action",
                         "prompt": "prompt",
@@ -751,7 +751,7 @@ _CONFIGS = [
     TrainConfig(
         name="pi0_aubo_low_mem_finetune",
         # Here is an example of loading a pi0 model for LoRA fine-tuning.
-        model=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_horizon=10),
+        model=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=7, action_horizon=32),
         data=LeRobotAuboDataConfig(
             repo_id="aubo_delta",
             base_config=DataConfig(
@@ -765,9 +765,7 @@ _CONFIGS = [
         # We have a convenience function in the model config that returns the default freeze filter
         # for the given model config for LoRA finetuning. Just make sure it matches the model config
         # you chose above.
-        freeze_filter=pi0.Pi0Config(
-            paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora"
-        ).get_freeze_filter(),
+        freeze_filter=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=7, action_horizon=32).get_freeze_filter(),
         # Turn off EMA for LoRA finetuning.
         ema_decay=None,
     ),

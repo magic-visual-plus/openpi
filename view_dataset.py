@@ -10,7 +10,8 @@ repo_id = "aubo_delta"
 
 episodes=[0, 1, 10, 11, 23]
 dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
-dataset = lerobot_dataset.LeRobotDataset(repo_id, episodes=episodes)
+# dataset = lerobot_dataset.LeRobotDataset(repo_id, episodes=episodes)
+dataset = lerobot_dataset.LeRobotDataset(repo_id)
 # And see how many frames you have:
 print(f"Selected episodes: {dataset.episodes}")
 print(f"Number of episodes selected: {dataset.num_episodes}")
@@ -18,9 +19,11 @@ print(f"Number of frames selected: {dataset.num_frames}")
 
 print(f'dataset.meta {dataset.meta}')
 
-episode_index = 0
+episode_index = 10
 from_idx = dataset.episode_data_index["from"][episode_index].item()
 to_idx = dataset.episode_data_index["to"][episode_index].item()
+
+print(f'from_idx {from_idx}, to_idx {to_idx}')
 
 # Then we grab all the image frames from the first camera:
 camera_key = dataset.meta.camera_keys[0]

@@ -6,6 +6,7 @@ to the config assets directory.
 """
 
 import os
+import jax
 
 os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com/'
 
@@ -59,8 +60,15 @@ def main(config_name: str = "pi0_so100_low_mem_finetune", max_frames: int | None
         num_frames = max_frames
         shuffle = True
 
+    # fix multiple devices, only support single device for now
+    sharding = jax.sharding.NamedSharding(
+        jax.sharding.Mesh([jax.devices()[0]], ("B",)),
+        jax.sharding.PartitionSpec("B"),
+    )
+    
     data_loader = _data_loader.TorchDataLoader(
         dataset,
+        sharding=sharding,
         local_batch_size=1,
         num_workers=10,
         shuffle=shuffle,
