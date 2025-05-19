@@ -45,6 +45,7 @@ def create_dataset(config: _config.TrainConfig) -> tuple[_config.DataConfig, _da
 def main(config_name: str = "pi0_so100_low_mem_finetune", max_frames: int | None = None):
     
     config = _config.get_config(config_name)
+    print(f'config name {config_name}, config {config}')
     data_config, dataset = create_dataset(config)
     
     output_path = config.assets_dirs / data_config.repo_id

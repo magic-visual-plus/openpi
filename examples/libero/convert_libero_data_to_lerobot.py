@@ -106,7 +106,6 @@ def main(data_dir: str, *, push_to_hub: bool = False):
             private=False,
             push_videos=True,
             license="apache-2.0",
-            token="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",
         )
 
 

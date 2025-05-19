@@ -126,7 +126,7 @@ class PI0_SINGLE:
 
     def get_action(self):
         assert (self.observation_window is not None), "update observation_window first!"
-        return self.policy.infer(self.observation_window)["actions"][:,:8]
+        return self.policy.infer(self.observation_window)["actions"][:,:7]
 
     def reset_obsrvationwindows(self):
         self.instruction = None

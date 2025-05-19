@@ -69,7 +69,8 @@ class AdamW(OptimizerConfig):
     b1: float = 0.9
     b2: float = 0.95
     eps: float = 1e-8
-    weight_decay: float = 1e-10
+    # weight_decay: float = 1e-10
+    weight_decay: float = 0.09
     clip_gradient_norm: float = 1.0
 
     def create(

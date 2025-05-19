@@ -83,7 +83,7 @@ dataset.consolidate()
 ```
 如果需要更改路径:
 ``` bash
-export LEROBOT_HOME="your path"
+export HF_LEROBOT_HOME="your path"
 ```
 
 ### step2. 设置`config.py`:

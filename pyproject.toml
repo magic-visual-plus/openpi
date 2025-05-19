@@ -59,10 +59,6 @@ dev = [
 [tool.uv.sources]
 openpi-client = { workspace = true }
 lerobot = { workspace = true }
-#lerobot = {url= "file:///tmp/test/lerobot.tar.gz"}
-#lerobot = { git = "https://github.com/huggingface/lerobot"}
-#lerobot = { git = "https://github.com/huggingface/lerobot", rev = "1c873df5c0dd4dd9a81cbd90e07dd95a272ee3f7" }
-#lerobot = { git = "https://ghfast.top/https://github.com/huggingface/lerobot", rev = "1c873df5c0dd4dd9a81cbd90e07dd95a272ee3f7" }
 
 [tool.uv.workspace]
 members = ["packages/*"]

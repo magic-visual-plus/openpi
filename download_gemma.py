@@ -18,5 +18,5 @@ import torch
 # Load model directly
 from transformers import AutoProcessor, AutoModelForImageTextToText
 
-processor = AutoProcessor.from_pretrained(model_id, token="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")
-model = AutoModelForImageTextToText.from_pretrained(model_id, token="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")
+processor = AutoProcessor.from_pretrained(model_id, token="{hf_token}")
+model = AutoModelForImageTextToText.from_pretrained(model_id, token="{hf_token}")
