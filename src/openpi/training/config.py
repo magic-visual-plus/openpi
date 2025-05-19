@@ -217,9 +217,9 @@ class LeRobotAuboDataConfig(DataConfigFactory):
                 # 把数据集中的键映射到模型的输入键
                 _transforms.RepackTransform(
                     {
-                        "observation/image": "images",
-                        "observation/wrist_image": "ORB_images",
-                        "observation/state": "state",
+                        "image": "images",
+                        "wrist_image": "ORB_images",
+                        "state": "state",
                         "actions": "action",
                         "prompt": "prompt",
                     }

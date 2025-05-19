@@ -10,7 +10,7 @@ zmq_client = ZMQResponseClient(ML_INFER_SERVER_HOST, ML_INFER_SERVER_PORT)
 obs_dict = make_aubo_example()
 
 # loop
-for i in range(100):
+for i in range(10):
     with Dbg_Timer("send_request"):
         # Send the request and receive the response
         #logger.info(f"obs_dict {obs_dict}")

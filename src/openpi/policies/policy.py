@@ -31,6 +31,8 @@ class Policy(BasePolicy):
         metadata: dict[str, Any] | None = None,
     ):
         self._sample_actions = nnx_utils.module_jit(model.sample_actions)
+        print(f'input transforms {transforms}')
+        print(f'output_transforms {output_transforms}')
         self._input_transform = _transforms.compose(transforms)
         # print(f'output_transforms {output_transforms}')
         self._output_transform = _transforms.compose(output_transforms)
