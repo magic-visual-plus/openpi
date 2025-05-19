@@ -13,7 +13,7 @@ def make_aubo_example() -> dict:
         "observation/state": np.random.rand(7),
         "observation/image": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
         "observation/wrist_image": np.zeros((224, 224, 3), dtype=np.uint8),
-        "prompt": "do something",
+        "prompt": "pick cup and place",
     }
 
 
