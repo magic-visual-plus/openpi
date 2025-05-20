@@ -6,7 +6,7 @@ import os
 
 
 repo_id = "aubo_delta"
-# repo_id = "so100_strawberry_grape"
+repo_id = "so100_strawberry_grape"
 
 episodes=[0, 1, 10, 11, 23]
 dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)

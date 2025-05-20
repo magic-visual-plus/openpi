@@ -751,7 +751,7 @@ _CONFIGS = [
     TrainConfig(
         name="pi0_aubo_low_mem_finetune",
         # Here is an example of loading a pi0 model for LoRA fine-tuning.
-        model=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=7, action_horizon=32),
+        model=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=32, action_horizon=32),
         data=LeRobotAuboDataConfig(
             repo_id="aubo_delta",
             base_config=DataConfig(
@@ -759,13 +759,13 @@ _CONFIGS = [
                 prompt_from_task=True,
             ),
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("/root/autodl-tmp/weights/pi0_base/params"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("/root/autodl-fs/weights/pi0_base/params"),
         num_train_steps=10_000,
         # The freeze filter defines which parameters should be frozen during training.
         # We have a convenience function in the model config that returns the default freeze filter
         # for the given model config for LoRA finetuning. Just make sure it matches the model config
         # you chose above.
-        freeze_filter=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=7, action_horizon=32).get_freeze_filter(),
+        freeze_filter=pi0.Pi0Config(paligemma_variant="gemma_2b_lora", action_expert_variant="gemma_300m_lora", action_dim=32, action_horizon=32).get_freeze_filter(),
         # Turn off EMA for LoRA finetuning.
         ema_decay=None,
     ),
