@@ -90,16 +90,26 @@ def create_dataset(data_config: _config.DataConfig, model_config: _model.BaseMod
         raise ValueError("Repo ID is not set. Cannot create dataset.")
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
-
-    dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
-    dataset = lerobot_dataset.LeRobotDataset(
-        data_config.repo_id,
-        delta_timestamps={
-            key: [t / dataset_meta.fps for t in range(model_config.action_horizon)]
-            for key in data_config.action_sequence_keys
-        },
-        # local_files_only=data_config.local_files_only,
-    )
+    if ',' in repo_id:
+        multi_repo_ids = repo_id.split(',')
+        dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(multi_repo_ids[0])
+        dataset = lerobot_dataset.MultiLeRobotDataset(
+            multi_repo_ids,
+            delta_timestamps={
+                key: [t / dataset_meta.fps for t in range(model_config.action_horizon)]
+                for key in data_config.action_sequence_keys
+            },
+        )
+    else:
+        dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
+        dataset = lerobot_dataset.LeRobotDataset(
+            data_config.repo_id,
+            delta_timestamps={
+                key: [t / dataset_meta.fps for t in range(model_config.action_horizon)]
+                for key in data_config.action_sequence_keys
+            },
+            # local_files_only=data_config.local_files_only,
+        )
 
     if data_config.prompt_from_task:
         dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])

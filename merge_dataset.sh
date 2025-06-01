@@ -1,0 +1,3 @@
+#  python packages/lerobot/lerobot/scripts/dataset_tool_cli.py merge --datasets "/opt/projects/openpi/datasets/hang256 /opt/projects/openpi/datasets/hang316" --output_dir "/opt/projects/openpi/datasets/ds_0601" --verbose
+
+python scripts/merge_lerobot_dataset.py --sources /opt/projects/openpi/datasets/hang256 /opt/projects/openpi/datasets/hang316 --output "/opt/projects/openpi/datasets/ds_0601" --copy_images
