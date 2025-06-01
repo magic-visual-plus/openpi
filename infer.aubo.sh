@@ -1,1 +1,1 @@
-python scripts/serve_policy_zmq.py policy:checkpoint --policy.config=pi0_aubo_low_mem_finetune --policy.dir=/root/autodl-fs/19999
+python scripts/serve_policy_zmq.py policy:checkpoint --policy.config=pi0_aubo_low_mem_finetune --policy.dir=/opt/projects/openpi/checkpoints/25000
